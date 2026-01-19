@@ -26,5 +26,12 @@
     "poster": "https://upload.wikimedia.org/wikipedia/en/3/31/The_SpongeBob_SquarePants_Movie_poster.jpg",
     "description": "SpongeBob and Patrick embark on a quest to retrieve King Neptune's stolen crown and save Mr. Krabs.",
     "trailer": "https://dn710601.ca.archive.org/0/items/TheSpongebobSquarepantsMovieTrailer/TheSpongebobSquarepantsMovieTrailer.mp4"
-  }
+  },
+  {
+  "title": "The Simpsons Movie",
+  "year": 2007,
+  "poster": "https://static.simpsonswiki.com/images/thumb/9/98/The_Simpsons_Movie.png/250px-The_Simpsons_Movie.png",
+  "description": "After Homer pollutes the town's water supply, Springfield is encased in a gigantic dome by the EPA and the family must save the world.",
+  "trailer": "https://ia803206.us.archive.org/33/items/animation-compendia-animation-c-the-simpsons-movie-work-in-progress-teaser-1080p/Animation%20CompendiaAnimation%20C%20-%20The%20Simpsons%20Movie%20-%20Work-in-Progress%20Teaser%20%281080p%29%20%28November%2021%2C%202006%29The%20Simpsons%20Movie%20-%20Work-in-Progress%20Teaser%20%281080p%29%20%28November%2021%2C%202006%29.mp4"
+}
 ]

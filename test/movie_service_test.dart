@@ -1,0 +1,87 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tp3_brooks_william/service/movie_service.dart';
+
+void main() {
+  const sampleJson = '''
+[
+  {
+    "title": "Inception",
+    "year": 2010,
+    "poster": "https://image.tmdb.org/t/p/w500/aej3LRUga5rhgkmRP6XMFw3ejbl.jpg",
+    "description": "Un voleur qui s'infiltre dans les rêves des gens pour voler leurs secrets se voit confier une mission impossible : implanter une idée dans l'esprit d'un PDG.",
+    "trailer": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  },
+  {
+    "title": "Interstellar",
+    "year": 2014,
+    "poster": "https://image.tmdb.org/t/p/w500/1pnigkWWy8W032o9TKDneBa3eVK.jpg",
+    "description": "Une équipe d'explorateurs voyage à travers un trou de ver dans l'espace pour assurer la survie de l'humanité face à la fin de la Terre.",
+    "trailer": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+  },
+  {
+    "title": "The Dark Knight",
+    "year": 2008,
+    "poster": "https://image.tmdb.org/t/p/w500/pyNXnq8QBWoK3b37RS6C3axwUOy.jpg",
+    "description": "Batman affronte le Joker, un criminel chaotique qui plonge Gotham dans l'anarchie et force le chevalier noir à affronter ses propres limites morales.",
+    "trailer": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+  },
+  {
+    "title": "The SpongeBob SquarePants Movie",
+    "year": 2004,
+    "poster": "https://upload.wikimedia.org/wikipedia/en/3/31/The_SpongeBob_SquarePants_Movie_poster.jpg",
+    "description": "SpongeBob and Patrick embark on a quest to retrieve King Neptune's stolen crown and save Mr. Krabs.",
+    "trailer": "https://dn710601.ca.archive.org/0/items/TheSpongebobSquarepantsMovieTrailer/TheSpongebobSquarepantsMovieTrailer.mp4"
+  },
+  {
+    "title": "The Simpsons Movie",
+    "year": 2007,
+    "poster": "https://static.simpsonswiki.com/images/thumb/9/98/The_Simpsons_Movie.png/250px-The_Simpsons_Movie.png",
+    "description": "After Homer pollutes the town's water supply, Springfield is encased in a gigantic dome by the EPA and the family must save the world.",
+    "trailer": "https://ia803206.us.archive.org/33/items/animation-compendia-animation-c-the-simpsons-movie-work-in-progress-teaser-1080p/Animation%20CompendiaAnimation%20C%20-%20The%20Simpsons%20Movie%20-%20Work-in-Progress%20Teaser%20%281080p%29%20%28November%2021%2C%202006%29The%20Simpsons%20Movie%20-%20Work-in-Progress%20Teaser%20%281080p%29%20%28November%2021%2C%202006%29.mp4"
+  }
+]
+''';
+
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    final data = Uint8List.fromList(utf8.encode(sampleJson));
+    ServicesBinding.instance.defaultBinaryMessenger.setMockMessageHandler(
+      'flutter/assets',
+      (message) async {
+        final key = utf8.decode(message!.buffer.asUint8List());
+        if (key == 'assets/data/movies.json') {
+          return ByteData.view(data.buffer);
+        }
+        return null;
+      },
+    );
+  });
+
+  test('MovieService charge et parse les films', () async {
+    final service = MovieService();
+    final movies = await service.loadLocalMovies();
+    expect(movies, isA<List<Movie>>());
+    expect(movies.length, 5);
+    expect(movies.first.title, 'Inception');
+  });
+
+  test('Movie.fromJson parse correctement', () {
+    final jsonMap = json.decode(sampleJson)[0] as Map<String, dynamic>;
+    final movie = Movie.fromJson(jsonMap);
+    expect(movie.title, 'Inception');
+    expect(movie.year, 2010);
+    expect(movie.poster, 'https://image.tmdb.org/t/p/w500/aej3LRUga5rhgkmRP6XMFw3ejbl.jpg');
+    expect(movie.description.contains('rêves'), true);
+    expect(movie.trailerUrl, 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+  });
+
+  test('MovieService retourne le bon nombre de films', () async {
+    final service = MovieService();
+    final movies = await service.loadLocalMovies();
+    expect(movies.length, json.decode(sampleJson).length);
+  });
+}
