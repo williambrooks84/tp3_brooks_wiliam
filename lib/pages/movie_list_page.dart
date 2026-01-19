@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../service/movie_service.dart';
 
 class MovieListPage extends StatefulWidget {
@@ -195,11 +196,28 @@ class MovieDetailPage extends StatefulWidget {
 
 class _MovieDetailPageState extends State<MovieDetailPage> {
   late bool isFavorite;
+  VideoPlayerController? _controller;
 
   @override
   void initState() {
     super.initState();
     isFavorite = widget.initialIsFavorite;
+
+    if (widget.movie.trailerUrl.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller =
+            VideoPlayerController.networkUrl(Uri.parse(widget.movie.trailerUrl))
+              ..initialize().then((_) {
+                if (mounted) setState(() {});
+              });
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 
   void _toggleFavorite() {
@@ -207,8 +225,18 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     widget.onFavoriteTap();
   }
 
+  void _togglePlay() {
+    if (_controller == null) return;
+    setState(() {
+      _controller!.value.isPlaying ? _controller!.pause() : _controller!.play();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hasTrailer = widget.movie.trailerUrl.isNotEmpty;
+    final controller = _controller;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.movie.title),
@@ -231,6 +259,20 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               width: double.infinity,
               height: 400,
               fit: BoxFit.cover,
+              filterQuality: FilterQuality.low,
+              cacheWidth: 800,
+              cacheHeight: 400,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return const SizedBox(
+                  height: 400,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              },
+              errorBuilder: (_, __, ___) => const SizedBox(
+                height: 400,
+                child: Center(child: Icon(Icons.broken_image)),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16),
@@ -241,7 +283,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     children: [
                       const Icon(Icons.calendar_today, size: 16),
                       const SizedBox(width: 8),
-                      Text('${widget.movie.year}', style: const TextStyle(fontSize: 16)),
+                      Text(
+                        '${widget.movie.year}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -257,6 +302,45 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 ],
               ),
             ),
+            if (hasTrailer) ...[
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: const Text(
+                  'Bande annonce',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: controller != null && controller.value.isInitialized
+                    ? Column(
+                        children: [
+                          AspectRatio(
+                            aspectRatio: controller.value.aspectRatio,
+                            child: VideoPlayer(controller),
+                          ),
+                          const SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: _togglePlay,
+                            icon: Icon(
+                              controller.value.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                            ),
+                            label: Text(
+                              controller.value.isPlaying ? 'Pause' : 'Play',
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(
+                        height: 200,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+              ),
+            ],
           ],
         ),
       ),
