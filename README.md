@@ -1,16 +1,19 @@
-# tp3_brooks_william
+Screens : 
 
-A new Flutter project.
+Accueil : 
+<img width="193" height="407" alt="image" src="https://github.com/user-attachments/assets/c3896236-cbb3-4a4c-b8bc-4c295f3e90f3" />
 
-## Getting Started
+Page d'un film : 
+<img width="205" height="415" alt="image" src="https://github.com/user-attachments/assets/b5a9ec15-b764-4a5d-9ba6-b7165f1e6b82" />
 
-This project is a starting point for a Flutter application.
+Favoris : 
+<img width="206" height="416" alt="image" src="https://github.com/user-attachments/assets/3c005899-9ba4-481e-b7e3-3e90418c840f" />
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Pendant ce TP j'ai appris à faire une liste de films avec l'utilisation d'une page favoris. Mon projet est séparé comme cela : 
+- lib/models : les classes des objets utilisés
+- lib/pages : les pages différentes du projet
+-- lib/service : kes fonctions permettant de récupérer les données nécessaires
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
